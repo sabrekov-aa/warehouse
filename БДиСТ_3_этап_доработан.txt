@@ -1,0 +1,190 @@
+﻿CREATE SEQUENCE код_харак NO MAXVALUE START 1;
+CREATE TABLE "Характеристики героев" (
+	"Код характеристики" int NOT NULL,
+	"Характеристика" VARCHAR(15) NOT NULL,
+	CONSTRAINT "Характеристики героев_pk" PRIMARY KEY ("Код характеристики")
+) WITH (
+  OIDS=FALSE
+);
+
+CREATE TABLE "Страны" (
+	"Код страны" serial NOT NULL,
+	"Название страны" VARCHAR(60) NOT NULL UNIQUE,
+	CONSTRAINT "Страны_pk" PRIMARY KEY ("Код страны")
+) WITH (
+  OIDS=FALSE
+);
+
+CREATE TABLE "Команды" (
+	"Код команды" serial NOT NULL PRIMARY KEY,
+	"Название команды" VARCHAR(60) NOT NULL,
+	"Процент побед" float NOT NULL CONSTRAINT полож_знач_проц_поб_команд CHECK ("Процент побед" > 0),
+	"Количество матчей на турнирах" int NOT NULL CONSTRAINT полож_знач_кол_матч_команд CHECK ("Количество матчей на турнирах" > 0),
+	"Популярность_место" int NOT NULL UNIQUE CONSTRAINT полож_знач_популярн CHECK ("Популярность_место" > 0)
+) WITH (
+  OIDS=FALSE
+);
+CREATE TABLE "Герои" (
+	"Код героя" serial NOT NULL,
+	"Имя героя" VARCHAR(40) NOT NULL UNIQUE,
+	"Основная характеристика героя" int NOT NULL REFERENCES "Характеристики героев"("Код характеристики"),
+	"Частота выбора" float NOT NULL CONSTRAINT полож_знач_част_выб CHECK ("Частота выбора" > 0),
+	"Процент побед" float NOT NULL CONSTRAINT полож_знач_проц_побед_гер CHECK ("Процент побед" > 0),
+	"Соотношение УСП" float NOT NULL  CONSTRAINT полож_знач_УСП CHECK ("Соотношение УСП" > 0),
+	CONSTRAINT Герои_pk PRIMARY KEY ("Код героя")
+) WITH (
+  OIDS=FALSE
+);
+
+CREATE TABLE "Профессиональные игроки" (
+	"Код игрока" serial NOT NULL,
+	"Ник игрока" VARCHAR(60) NOT NULL UNIQUE,
+	"Команда игрока" int NOT NULL REFERENCES "Команды"("Код команды"),
+	"Процент побед" float NOT NULL CONSTRAINT полож_знач_проц_поб_игрок CHECK ("Процент побед" > 0),
+	"Количество матчей" int NOT NULL CONSTRAINT полож_знач_кол_матч_игрок CHECK ("Количество матчей" > 0),
+	"Имя" VARCHAR(60) NOT NULL,
+	"Фамилия" VARCHAR(60) NOT NULL,
+	"Страна" int NOT NULL REFERENCES "Страны"("Код страны"),
+	CONSTRAINT "Профессиональные игроки_pk" PRIMARY KEY ("Код игрока")
+) WITH (
+  OIDS=FALSE
+);
+
+CREATE TABLE "Роли в игре" (
+	"Код роли" serial NOT NULL,
+	"Название роли" VARCHAR(20) NOT NULL,
+	CONSTRAINT "Роли в игре_pk" PRIMARY KEY ("Код роли")
+) WITH (
+  OIDS=FALSE
+);
+
+CREATE TABLE "Герой_Роль" (
+	"Код Героя" int NOT NULL PRIMARY KEY REFERENCES "Герои"("Код героя"),
+	"Код Роли" int NOT NULL REFERENCES "Роли в игре"("Код роли")
+) WITH (
+  OIDS=FALSE
+);
+
+CREATE TABLE "Игрок_Роль" (
+	"Код игрока" int NOT NULL PRIMARY KEY REFERENCES "Профессиональные игроки"("Код игрока"),
+	"Код роли" int NOT NULL REFERENCES "Роли в игре"("Код роли")
+) WITH (
+  OIDS=FALSE
+);
+ALTER TABLE "Характеристики героев" ALTER COLUMN "Код характеристики" SET DEFAULT NEXTVAL('код_харак');
+INSERT INTO "Роли в игре" ("Название роли") VALUES 
+('Керри'),
+('Мидер'),
+('Оффлейнер'),
+('Саппор'),
+('Роумер'),
+('Лесник')
+;
+INSERT INTO "Страны" ("Название страны") VALUES
+('Россия'),
+('Украина'),
+('США'),
+('Канада'),
+('Франция'),
+('Испания'),
+('Италия'),
+('Китай'),
+('Нидерланды'),
+('Иордания'),
+('Шведция'),
+('Германия'),
+('Эстония'),
+('Дания'),
+('Ливан')
+;
+
+INSERT INTO "Команды" ("Название команды", "Процент побед", "Количество матчей на турнирах","Популярность_место") VALUES
+('Team Liquid',	61.12, 1075, 1),
+('Evil Geniuses',	61.71, 1426, 2),
+('Natus Vincere',	57.69, 1449, 3),
+('OG',	63.91, 460, 4),
+('Team Secret',	66.67, 708, 5),
+('Cloud9',		57.20, 590, 6),
+('Virtus.pro',	60.83, 868, 8),
+('Newbee',		62.33, 1075, 9),
+('Team Empire',	60.44, 1810, 21),
+('LGD-GAMING',	59.85, 1497, 18),
+('Invicus Gaming',	60.35, 1415, 17),
+('Alliance',	52.17, 595, 7),
+('Team Spirit',	52.69, 353, 23),
+('Fnatic', 55.85, 1223, 13),
+('Ehome', 57.76, 760, 32)
+;
+INSERT INTO "Профессиональные игроки" ("Ник игрока", "Команда игрока", "Процент побед", "Количество матчей", "Имя", "Фамилия", "Страна") VALUES
+('Miracle',	1,	65.04,	655,	'Amar',	'al-Barkawi',	10),
+('Dendi',	3,	56.8,	1815, 'Данил', 'Ишутин',	2),
+('Arteezy',	2,	62.34,	1718,	'Артур', 'Бабаев',	4),
+('RAMZES666', 7,	63.75,	822,	'Роман', 'Кушнарёв',	1),
+('s4',	4,	65.11,	1473,	'Gustav', 'Magnusson',	11),
+('SumaiL',	2,	60.56,	819,	'Sumail', 'Hassan',	3),
+('KyroKy', 1,	63.93,	1536,	'Kuro', 'Salehi',	12),
+('Loda', 12,	58.17,	1609,	'Johathan', 'Berg',	11),
+('Puppey',	5,	65.02,	1421,	'Клемент',	'Иванов',	13),
+('N0tail',	4,	61.71,	1546,	'Johan', 'Sundstein',	14),
+('EternaLEnVy',	14,	57.71,	1291,	'Jacky',	'Mao',	5),
+('w33',	2,	57.05,	1064,	'Omar',	'Aliwi',	4),
+('Fear',	2,	59.23,	1344,	'Clinton',	'Loomis',	3),
+('BurNIng',	11,	61.71,	1491,	'Xu', 'Zhilei',	8),
+('Gh',	1,	69.35,	385, 'Maroun', 'Merhej', 15)
+;
+INSERT INTO "Характеристики героев" ("Характеристика") VALUES
+('Сила'),
+('Ловкость'),
+('Интеллект')
+;
+INSERT INTO "Герои" ("Имя героя", "Основная характеристика героя", "Частота выбора", "Процент побед", "Соотношение УСП") VALUES
+('Phantom Assassin',	2,	30.46,	53.69,	3.12),
+('Pudge',	1,	29.49,	51.85,	2.28),
+('Sniper',	2,	26.48,	51.22,	3.54),
+('Bloodseeker',	2,	25.58,	55.10, 3.24),
+('Invoker',	3,	25.53,	45.14,	2.75),
+('Necrophos',	3,	25.37,	58.65,	3.15),
+('Legion Commander',	1,	22.63,	47.42,	2.96),
+('Windranger',	3,	19.07,	50.06,	2.37),
+('Spirit Breaker',	1,	18.80,	56.54,	2.67),
+('Monkey King',	2,	18.21,	47.82,	3.08),
+('Anti-Mage',	2,	18.14,	46.70,	2.53),
+('Earthshaker',	1,	17.61,	51.41,	2.92),
+('Axe',	1,	16.82,	53.28,	2.28),
+('Viper',	2,	16.41,	51.26,	3.41),
+('Sven',	1,	16.09,	52.66,	2.88)
+;
+INSERT INTO "Герой_Роль" ("Код Героя","Код Роли") VALUES
+(1,1),
+(9,5),
+(3,1),
+(5,2),
+(4,2),
+(6,2),
+(8,3),
+(7,3),
+(2,5),
+(10,2),
+(11,1),
+(12,3),
+(13,3),
+(14,2),
+(15,1)
+;
+INSERT INTO "Игрок_Роль" ("Код игрока","Код роли") VALUES
+(2,2),
+(1,2),
+(3,2),
+(4,1),
+(6,2),
+(5,2),
+(7,4),
+(8,1),
+(9,6),
+(10,4),
+(11,1),
+(12,2),
+(14,1),
+(13,1),
+(15,4)
+;
